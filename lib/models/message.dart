@@ -5,8 +5,7 @@ class Message {
   final int receiverId;
 
   Message(
-      {
-        required this.content,
+      {required this.content,
       required this.time,
       required this.receiverId,
       required this.senderId});
