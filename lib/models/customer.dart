@@ -1,4 +1,4 @@
-class User {
+class Customer {
   //attributs
   late String id;
   late String firstname;
@@ -16,7 +16,7 @@ class User {
 
   //un ou des constructeurs
 
-  User.empty() {
+  Customer.empty() {
     id = "";
     firstname = "";
     lastname = "";
