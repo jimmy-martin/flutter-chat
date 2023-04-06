@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
 
         //image
         const SizedBox(height: 5),
-        Image.asset(defaultImage),
+        Image.asset(defaultImage,height: 200, width: 200),
         const SizedBox(height: 5),
 
         const SizedBox(height: 20),
@@ -142,16 +142,21 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(width: 15),
             if (selection[0] == false)
-              Container(
-                width: MediaQuery.of(context).size.width * 0.4,
+
+            Expanded(
+              child: Container(
                 child: TextField(
                   controller: lastname,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      hintText: "Nom"),
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      hintText: "Nom"
+                  ),
                 ),
               ),
+            ),
+
           ]),
 
         const SizedBox(height: 10),
