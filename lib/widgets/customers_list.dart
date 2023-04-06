@@ -17,7 +17,7 @@ class _CustomersListState extends State<CustomersList> {
     return StreamBuilder<QuerySnapshot>(
         stream: FirestoreHelper().firebaseCustomers.snapshots(),
         builder: (context, snapshot) {
-          List documents = snapshot.data!.docs ?? [];
+          List documents = snapshot.data?.docs ?? [];
 
           if (documents.isEmpty) {
             return const Center(child: CircularProgressIndicator.adaptive());
