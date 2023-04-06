@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat/globals.dart';
 
 class Customer {
-
   late String id;
   late String firstname;
   late String lastname;
@@ -13,7 +12,7 @@ class Customer {
   List? favorites;
 
   String get fullName {
-    return "$firstname $lastname";
+    return '$firstname $lastname';
   }
 
   Customer(DocumentSnapshot snapshot) {
@@ -22,9 +21,9 @@ class Customer {
     firstname = map['firstname'];
     lastname = map['lastname'];
     email = map['email'];
-    avatar = map["avatar"] ?? defaultImage;
-    favorites = map["favorites"] ?? [];
-    Timestamp? provisionalTime = map["birthday"];
+    avatar = map['avatar'] ?? defaultImage;
+    favorites = map['favorites'] ?? [];
+    Timestamp? provisionalTime = map['birthday'];
     if (provisionalTime == null) {
       birthday = DateTime.now();
     } else {
