@@ -3,4 +3,4 @@ import 'package:flutter_chat/models/customer.dart';
 
 Customer myUser = Customer.empty();
 Color defaultColor = Colors.blue;
-String defaultImage = "Ajouter une image ici";
+String defaultImage = "assets/user.png";

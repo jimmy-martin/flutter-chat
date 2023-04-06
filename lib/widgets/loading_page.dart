@@ -27,7 +27,7 @@ class _LoadingPageState extends State<LoadingPage>
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const MyHomePage(title: "Hello World");
+            return const HomePage(title: "Flutter Chat");
           }));
         } else if (status == AnimationStatus.dismissed) {
           _animationController.forward();
@@ -50,6 +50,12 @@ class _LoadingPageState extends State<LoadingPage>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Lottie.asset("assets/welcome.json"),
+            // add circle loader here
+            LinearProgressIndicator(
+              minHeight: 5,
+              value: _animationController.value,
+              valueColor: const AlwaysStoppedAnimation(Colors.green),
+            )
           ],
         ),
       ),

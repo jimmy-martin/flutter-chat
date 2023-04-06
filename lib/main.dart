@@ -1,7 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/firebase_options.dart';
+import 'package:flutter_chat/globals.dart';
+import 'package:flutter_chat/services/firestore_helper.dart';
 import 'package:flutter_chat/services/permission_helper.dart';
+import 'package:flutter_chat/widgets/dashboard.dart';
 import 'package:flutter_chat/widgets/loading_page.dart';
 
 void main() async {
@@ -20,12 +25,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter App',
-      debugShowCheckedModeBanner: false,     
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const LoadingPage(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -42,54 +46,45 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextEditingController mail = TextEditingController();
   TextEditingController password = TextEditingController();
-  TextEditingController prenom = TextEditingController();
-  TextEditingController nom = TextEditingController();
+  TextEditingController firstname = TextEditingController();
+  TextEditingController lastname = TextEditingController();
   List<bool> selection = [true, false];
 
-
-
   //Méthode
-  popUp(){
+  popUp() {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context){
-          if (defaultTargetPlatform == TargetPlatform.iOS){
+        builder: (context) {
+          if (defaultTargetPlatform == TargetPlatform.iOS) {
             return CupertinoAlertDialog(
               title: const Text("Erreur"),
-              content: const Text("Votre email et/ou votre mot de passe sont incorrectes"),
+              content: const Text(
+                  "Votre email et/ou votre mot de passe sont incorrectes"),
               actions: [
                 TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text("ok")
-                )
+                    child: const Text("OK"))
               ],
-
             );
-          }
-          else
-          {
+          } else {
             return AlertDialog(
               title: const Text("Erreur"),
-              content: const Text("Votre email et/ou votre mot de passe sont incorrectes"),
+              content: const Text(
+                  "Votre email et/ou votre mot de passe sont incorrectes"),
               actions: [
                 TextButton(
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text("ok")
-                )
+                    child: const Text("OK"))
               ],
             );
           }
-        }
-    );
+        });
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,17 +101,11 @@ class _HomePageState extends State<HomePage> {
   Widget bodyPage() {
     return Column(
       children: [
-
         ToggleButtons(
-
           selectedColor: Colors.blue,
-
           borderRadius: BorderRadius.circular(10),
-
-
-
-          onPressed: (int choix) {
-            if (choix == 0) {
+          onPressed: (int choice) {
+            if (choice == 0) {
               setState(() {
                 selection[0] = true;
                 selection[1] = false;
@@ -129,75 +118,57 @@ class _HomePageState extends State<HomePage> {
             }
           },
           isSelected: selection,
-          children: const [ Text("Connexion"),  Text("Inscription")       ],
-
-
+          children: const [Text("Connexion"), Text("Inscription")],
         ),
 
         //image
-        const SizedBox(height:5),
-        Image.network("https://img.icons8.com/clouds/512/user.png"),
-        const SizedBox(height:5),
-
-
-
-
+        const SizedBox(height: 5),
+        Image.asset(defaultImage),
+        const SizedBox(height: 5),
 
         const SizedBox(height: 20),
         const SizedBox(height: 20),
         if (selection[0] == false)
-
-
-          Row(   children:[
-
-            Container( width: MediaQuery.of(context).size.width*0.5,
+          Row(children: [
+            Container(
+              width: MediaQuery.of(context).size.width * 0.5,
               child: TextField(
-
-                controller: prenom,
+                controller: firstname,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     hintText: "Prénom"),
               ),
             ),
-
-
             const SizedBox(width: 15),
             if (selection[0] == false)
-
-              Container( width: MediaQuery.of(context).size.width*0.4,
+              Container(
+                width: MediaQuery.of(context).size.width * 0.4,
                 child: TextField(
-
-                  controller: nom,
+                  controller: lastname,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10)),
                       hintText: "Nom"),
                 ),
               ),
-          ]
-          ),
-
-
-
-
+          ]),
 
         const SizedBox(height: 10),
         TextField(
           controller: mail,
           decoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               hintText: "Email"),
-
         ),
         const SizedBox(height: 10),
         TextField(
           controller: password,
           obscureText: true,
           decoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               hintText: "Mot de passe"),
         ),
         const SizedBox(height: 10),
@@ -206,58 +177,44 @@ class _HomePageState extends State<HomePage> {
           style: ElevatedButton.styleFrom(
             primary: Colors.blue,
             onPrimary: Colors.white,
-
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-
-          onPressed: (){
-
-            if(selection[0]== false){
+          onPressed: () {
+            if (selection[0] == false) {
               //si on en mode inscription
-              FirestoreHelper().Inscription(mail.text, password.text, nom.text, prenom.text).then((value) {
+              FirestoreHelper()
+                  .register(
+                      mail.text, password.text, lastname.text, firstname.text)
+                  .then((value) {
                 //si la méthode fonctionne bien
                 setState(() {
-                  monUtilisateur = value;
+                  myUser = value;
                 });
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context){
-                      return DashBoardView(mail: mail.text, password: password.text);
-                    }
-                ));
-
-
-              }).catchError((onError){
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return DashBoard(mail: mail.text, password: password.text);
+                }));
+              }).catchError((onError) {
                 //si on constate une erreur
                 popUp();
-
               });
-            }
-            else
-            {
+            } else {
               //si en mode connexion
-              FirestoreHelper().Connect(mail.text, password.text).then((value){
+              FirestoreHelper().connect(mail.text, password.text).then((value) {
                 setState(() {
-                  monUtilisateur = value;
+                  myUser = value;
                 });
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context){
-                      return DashBoardView(mail: mail.text, password: password.text);
-                    }
-                ));
-              }).catchError((onError){
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return DashBoard(mail: mail.text, password: password.text);
+                }));
+              }).catchError((onError) {
                 popUp();
               });
             }
-
-
-
-
           },
           child: const Text('Valider'),
         )
-
       ],
     );
   }
