@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
 
         //image
         const SizedBox(height: 5),
-        Image.asset(defaultImage),
+        Image.network(defaultImage),
         const SizedBox(height: 5),
 
         const SizedBox(height: 20),
