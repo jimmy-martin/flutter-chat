@@ -119,7 +119,16 @@ class _HomePageState extends State<HomePage> {
             }
           },
           isSelected: selection,
-          children: const [Text("Connexion"), Text("Inscription")],
+          children: const [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Connexion"),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Inscription"),
+            ),
+          ],
         ),
 
         //image
@@ -131,7 +140,7 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 20),
         if (selection[0] == false)
           Row(children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.5,
               child: TextField(
                 controller: firstname,
@@ -143,7 +152,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(width: 15),
             if (selection[0] == false)
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width * 0.4,
                 child: TextField(
                   controller: lastname,
