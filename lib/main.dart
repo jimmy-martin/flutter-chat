@@ -175,8 +175,8 @@ class _HomePageState extends State<HomePage> {
 
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: Colors.blue,
-            onPrimary: Colors.white,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -222,8 +222,8 @@ class _HomePageState extends State<HomePage> {
 
 class Styles {
   static final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-    primary: Colors.blue,
-    onPrimary: Colors.white,
+    foregroundColor: Colors.white,
+    backgroundColor: Colors.blue,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
         Radius.circular(10),
