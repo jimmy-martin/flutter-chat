@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_chat/globals.dart';
+
 class Customer {
-  //attributs
   late String id;
   late String firstname;
   late String lastname;
@@ -9,12 +11,25 @@ class Customer {
   late String email;
   List? favorites;
 
-  //variable calculé
   String get fullName {
-    return firstname + " " + lastname;
+    return '$firstname $lastname';
   }
 
-  //un ou des constructeurs
+  Customer(DocumentSnapshot snapshot) {
+    id = snapshot.id;
+    Map<String, dynamic> map = snapshot.data() as Map<String, dynamic>;
+    firstname = map['firstname'];
+    lastname = map['lastname'];
+    email = map['email'];
+    avatar = map['avatar'] ?? defaultImage;
+    favorites = map['favorites'] ?? [];
+    Timestamp? provisionalTime = map['birthday'];
+    if (provisionalTime == null) {
+      birthday = DateTime.now();
+    } else {
+      birthday = provisionalTime.toDate();
+    }
+  }
 
   Customer.empty() {
     id = "";
@@ -22,6 +37,4 @@ class Customer {
     lastname = "";
     email = "";
   }
-
-  //méthode
 }
