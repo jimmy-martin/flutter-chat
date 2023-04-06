@@ -1,6 +1,7 @@
 import 'package:flutter_chat/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/widgets/customers_list.dart';
+import 'package:flutter_chat/widgets/favorites_list.dart';
 import 'package:flutter_chat/widgets/mydrawer.dart';
 import 'package:flutter_chat/widgets/new_features_list.dart';
 
@@ -62,7 +63,7 @@ class _DashBoardState extends State<DashBoard> {
       },
       children: const [
         CustomersList(),
-        Text("Liste des favoris"),
+        FavoritesList(),
         NewFeaturesList(),
       ],
     );
