@@ -74,9 +74,10 @@ class MyDrawerState extends State<MyDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Padding(
-      padding: const EdgeInsets.all(15),
+      padding: EdgeInsets.only(top: statusBarHeight),
       child: Column(children: [
         //avatar
         //cliqubale pour changer la photo de l'avatar
