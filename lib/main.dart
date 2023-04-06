@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: defaultColor,
       ),
       home: const LoadingPage(),
     );
@@ -90,6 +90,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: const Text("Flutter Chat"),
         ),
         body: Padding(

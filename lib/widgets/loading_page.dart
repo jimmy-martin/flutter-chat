@@ -26,9 +26,12 @@ class _LoadingPageState extends State<LoadingPage>
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const HomePage(title: "Flutter Chat");
-          }));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(title: "Flutter Chat"),
+            ),
+          );
         } else if (status == AnimationStatus.dismissed) {
           _animationController.forward();
         }
