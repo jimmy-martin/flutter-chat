@@ -23,7 +23,7 @@ class _NewFeaturesListState extends State<NewFeaturesList> {
       itemCount: _newFeatures.length,
       itemBuilder: (context, index) {
         return ListTile(
-          leading: const Icon(Icons.new_releases),
+          leading: const Icon(Icons.new_releases, color: Colors.blue),
           title: Text(_newFeatures[index]),
         );
       },
