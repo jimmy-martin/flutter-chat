@@ -18,7 +18,7 @@ class _LoadingPageState extends State<LoadingPage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     )
       ..forward()
       ..addListener(() {
@@ -26,9 +26,12 @@ class _LoadingPageState extends State<LoadingPage>
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const HomePage(title: "Flutter Chat");
-          }));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(title: "Flutter Chat"),
+            ),
+          );
         } else if (status == AnimationStatus.dismissed) {
           _animationController.forward();
         }
@@ -43,18 +46,21 @@ class _LoadingPageState extends State<LoadingPage>
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SafeArea(
-      child: Flexible(
+      child: SizedBox(
+        height: screenHeight,
+        width: screenWidth,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Lottie.asset("assets/welcome.json"),
-            // add circle loader here
-            LinearProgressIndicator(
-              minHeight: 5,
+            CircularProgressIndicator(
               value: _animationController.value,
-              valueColor: const AlwaysStoppedAnimation(Colors.green),
+              valueColor: const AlwaysStoppedAnimation(Colors.blue),
             )
           ],
         ),

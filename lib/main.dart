@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: defaultColor,
       ),
       home: const LoadingPage(),
     );
@@ -90,6 +90,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: const Text("Flutter Chat"),
         ),
         body: Padding(
@@ -118,19 +119,28 @@ class _HomePageState extends State<HomePage> {
             }
           },
           isSelected: selection,
-          children: const [Text("Connexion"), Text("Inscription")],
+          children: const [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Connexion", style: TextStyle(color: defaultColor)),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Inscription", style: TextStyle(color: defaultColor)),
+            ),
+          ],
         ),
 
         //image
         const SizedBox(height: 5),
-        Image.asset(defaultImage,height: 200, width: 200),
+        Image.network(defaultImage, height: 200, width: 200),
         const SizedBox(height: 5),
 
         const SizedBox(height: 20),
         const SizedBox(height: 20),
         if (selection[0] == false)
           Row(children: [
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.5,
               child: TextField(
                 controller: firstname,
@@ -142,7 +152,6 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(width: 15),
             if (selection[0] == false)
-
             Expanded(
               child: Container(
                 child: TextField(
@@ -180,8 +189,8 @@ class _HomePageState extends State<HomePage> {
 
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            primary: Colors.blue,
-            onPrimary: Colors.white,
+            foregroundColor: Colors.white,
+            backgroundColor: defaultColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -227,8 +236,8 @@ class _HomePageState extends State<HomePage> {
 
 class Styles {
   static final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-    primary: Colors.blue,
-    onPrimary: Colors.white,
+    foregroundColor: Colors.white,
+    backgroundColor: Colors.blue,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(
         Radius.circular(10),

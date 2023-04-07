@@ -1,11 +1,14 @@
 import 'package:flutter_chat/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/widgets/customers_list.dart';
+import 'package:flutter_chat/widgets/favorites_list.dart';
 import 'package:flutter_chat/widgets/mydrawer.dart';
+import 'package:flutter_chat/widgets/new_features_list.dart';
 
 class DashBoard extends StatefulWidget {
   String mail;
   String password;
+
   DashBoard({Key? key, required this.mail, required this.password})
       : super(key: key);
 
@@ -15,8 +18,9 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   //variable
-  int indexCurrent = 1;
-  PageController controllerPage = PageController(initialPage: 1);
+  int indexCurrent = 0;
+  PageController controllerPage = PageController(initialPage: 0);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,10 +42,11 @@ class _DashBoardState extends State<DashBoard> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: "Person"),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: "Personnes"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.ac_unit_outlined), label: "Favorites"),
-          BottomNavigationBarItem(icon: Icon(Icons.back_hand), label: "New"),
+              icon: Icon(Icons.star, color: Colors.yellow), label: "Favoris"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.new_releases), label: "Nouveautés"),
         ],
       ),
     );
@@ -58,8 +63,8 @@ class _DashBoardState extends State<DashBoard> {
       },
       children: const [
         CustomersList(),
-        Text("Deuxième page"),
-        Text("Troisème page"),
+        FavoritesList(),
+        NewFeaturesList(),
       ],
     );
   }
