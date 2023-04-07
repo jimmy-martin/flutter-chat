@@ -44,9 +44,9 @@ class _DashBoardState extends State<DashBoard> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Personnes"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.ac_unit_outlined), label: "Favoris"),
+              icon: Icon(Icons.star, color: Colors.yellow), label: "Favoris"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.back_hand), label: "Nouveautés"),
+              icon: Icon(Icons.new_releases), label: "Nouveautés"),
         ],
       ),
     );

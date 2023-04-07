@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat/globals.dart';
 
 class NewFeaturesList extends StatefulWidget {
   const NewFeaturesList({Key? key}) : super(key: key);
@@ -24,7 +25,7 @@ class _NewFeaturesListState extends State<NewFeaturesList> {
       itemCount: _newFeatures.length,
       itemBuilder: (context, index) {
         return ListTile(
-          leading: const Icon(Icons.new_releases, color: Colors.blue),
+          leading: const Icon(Icons.new_releases, color: defaultColor),
           title: Text(_newFeatures[index]),
         );
       },

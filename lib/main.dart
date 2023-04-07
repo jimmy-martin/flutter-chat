@@ -122,11 +122,11 @@ class _HomePageState extends State<HomePage> {
           children: const [
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text("Connexion"),
+              child: Text("Connexion", style: TextStyle(color: defaultColor)),
             ),
             Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text("Inscription"),
+              child: Text("Inscription", style: TextStyle(color: defaultColor)),
             ),
           ],
         ),
@@ -186,7 +186,7 @@ class _HomePageState extends State<HomePage> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+            backgroundColor: defaultColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
