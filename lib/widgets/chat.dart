@@ -1,106 +1,161 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_chat/globals.dart';
+import 'package:flutter_chat/models/customer.dart';
+import 'package:flutter_chat/models/message.dart';
+import 'package:flutter_chat/repositories/message_repository.dart';
+import 'package:flutter_chat/services/firestore_helper.dart';
+import 'package:intl/intl.dart';
+import 'package:random_string/random_string.dart';
 
 class Chat extends StatefulWidget {
+  final Customer customer;
+
+  const Chat({Key? key, required this.customer}) : super(key: key);
+
   @override
-  _ChatState createState() => _ChatState();
+  State<Chat> createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  List<String> _messages = [];
-  final TextEditingController _textController = TextEditingController();
-
-  void _addMessage(String message) {
-    setState(() {
-      _messages.add(message);
-    });
-    _textController.clear();
-  }
-
-  Widget _buildTextComposer() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        children: <Widget>[
-          Flexible(
-            child: TextField(
-              controller: _textController,
-              onSubmitted: _addMessage,
-              decoration:
-              InputDecoration.collapsed(hintText: "Entrez votre message"),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 4.0),
-            child: IconButton(
-              icon: Icon(Icons.send),
-              onPressed: () => _addMessage(_textController.text),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-
-
-
-
-
-
-
+  final TextEditingController _messageController = TextEditingController();
+  final MessageRepository _messageRepository = MessageRepository();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Flutter Chat"),
-      ),
+      appBar: AppBar(title: Text(widget.customer.fullName)),
       body: Column(
-        children: <Widget>[
-          Flexible(
-            child: ListView.builder(
-              padding: EdgeInsets.all(8.0),
-              reverse: true,
-              itemCount: _messages.length,
-              itemBuilder: (_, int index) => _buildMessage(_messages[index]),
+        children: [
+          Expanded(child: _buildMessageList()),
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirestoreHelper().firebaseMessages.orderBy('time').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print(snapshot.error.toString());
+          return Text(snapshot.error.toString());
+        }
+
+        List<QueryDocumentSnapshot> messages = snapshot.data!.docs;
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+
+            final message = Message(
+              id: messages[index]['id'],
+              content: messages[index]['content'],
+              time: messages[index]['time'],
+              senderId: messages[index]['senderId'],
+              receiverId: messages[index]['receiverId'],
+            );
+
+            if (message.receiverId == widget.customer.id &&
+                    message.senderId == myUser.id ||
+                message.receiverId == myUser.id &&
+                    message.senderId == widget.customer.id) {
+              bool isSentByCurrentUser = message.senderId == myUser.id;
+              return _buildMessageBubble(message, isSentByCurrentUser);
+            } else {
+              return Container();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageBubble(Message message, bool isSentByCurrentUser) {
+    final formatter = DateFormat('HH:mm');
+    final hours = formatter.format(message.time.toDate());
+
+    return Align(
+      alignment:
+          isSentByCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: isSentByCurrentUser ? defaultColor : Colors.grey,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.content,
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hours,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(30),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              decoration: InputDecoration(
+                hintText: "Tapez votre message ici",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ),
-          Divider(height: 1.0),
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-            ),
-            child: _buildTextComposer(),
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: _sendMessage,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMessage(String message) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(child: Text("User")),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("User Name", style: Theme.of(context).textTheme.subtitle1),
-              Container(
-                margin: EdgeInsets.only(top: 5.0),
-                child: Text(message),
-              ),
-            ],
-          ),
-        ],
-      ),
+  void _sendMessage() {
+    String content = _messageController.text.trim();
+    if (content.isEmpty) return;
+
+    Message message = Message(
+      id: randomAlphaNumeric(20),
+      content: content,
+      time: Timestamp.now(),
+      senderId: myUser.id,
+      receiverId: widget.customer.id,
+    );
+
+    _messageRepository.sendMessage(message);
+    _messageController.clear();
+
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }

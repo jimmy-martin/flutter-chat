@@ -4,6 +4,7 @@ import 'package:flutter_chat/globals.dart';
 import 'package:flutter_chat/models/customer.dart';
 import 'package:flutter_chat/repositories/customer_repository.dart';
 import 'package:flutter_chat/services/firestore_helper.dart';
+import 'package:flutter_chat/widgets/chat.dart';
 
 class CustomersList extends StatefulWidget {
   const CustomersList({Key? key}) : super(key: key);
@@ -37,7 +38,10 @@ class _CustomersListState extends State<CustomersList> {
                 elevation: 5,
                 child: ListTile(
                   onTap: () {
-                    // TODO: Ouvrir une nouvelle page de chat
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return Chat(customer: customer);
+                    }));
                   },
                   leading: CircleAvatar(
                     radius: 30,
