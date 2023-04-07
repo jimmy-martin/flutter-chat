@@ -15,6 +15,7 @@ class _NewFeaturesListState extends State<NewFeaturesList> {
     "Créer un groupe",
     "Mot de passe oublié",
     "Connexion avec Google, Facebook, etc.",
+    "La vérificatoin de correspondance de mot de passe lors de la création d'un compte",
   ];
 
   @override
