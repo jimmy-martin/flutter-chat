@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +17,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  String locale = Platform.localeName;
+  if (locale.contains("_")) {
+    setDeviceLocale(locale.split("_")[0]);
+  }
+
   runApp(const MyApp());
 }
 
@@ -139,34 +147,33 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 20),
         const SizedBox(height: 20),
         if (selection[0] == false)
-          Row(children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: TextField(
-                controller: firstname,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    hintText: "Prénom"),
-              ),
-            ),
-            const SizedBox(width: 15),
-            if (selection[0] == false)
-            Expanded(
-              child: Container(
+          Row(
+            children: [
+              Expanded(
                 child: TextField(
-                  controller: lastname,
+                  controller: firstname,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)
-                      ),
-                      hintText: "Nom"
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    hintText: "Prénom",
                   ),
                 ),
               ),
-            ),
-
-          ]),
+              const SizedBox(width: 15),
+              Expanded(
+                child: TextField(
+                  controller: lastname,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    hintText: "Nom",
+                  ),
+                ),
+              ),
+            ],
+          ),
 
         const SizedBox(height: 10),
         TextField(
