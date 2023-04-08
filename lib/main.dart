@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +17,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 
@@ -49,6 +52,8 @@ class _HomePageState extends State<HomePage> {
   TextEditingController firstname = TextEditingController();
   TextEditingController lastname = TextEditingController();
   List<bool> selection = [true, false];
+
+  String selectedLanguage = "fr";
 
   //Méthode
   popUp() {
@@ -100,136 +105,177 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget bodyPage() {
-    return Column(
-      children: [
-        ToggleButtons(
-          selectedColor: Colors.blue,
-          borderRadius: BorderRadius.circular(10),
-          onPressed: (int choice) {
-            if (choice == 0) {
-              setState(() {
-                selection[0] = true;
-                selection[1] = false;
-              });
-            } else {
-              setState(() {
-                selection[0] = false;
-                selection[1] = true;
-              });
-            }
-          },
-          isSelected: selection,
-          children: const [
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text("Connexion", style: TextStyle(color: defaultColor)),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text("Inscription", style: TextStyle(color: defaultColor)),
-            ),
-          ],
-        ),
-
-        //image
-        const SizedBox(height: 5),
-        Image.network(defaultImage, height: 200, width: 200),
-        const SizedBox(height: 5),
-
-        const SizedBox(height: 20),
-        const SizedBox(height: 20),
-        if (selection[0] == false)
-          Row(children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: TextField(
-                controller: firstname,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    hintText: "Prénom"),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          ToggleButtons(
+            selectedColor: Colors.blue,
+            borderRadius: BorderRadius.circular(10),
+            onPressed: (int choice) {
+              if (choice == 0) {
+                setState(() {
+                  selection[0] = true;
+                  selection[1] = false;
+                });
+              } else {
+                setState(() {
+                  selection[0] = false;
+                  selection[1] = true;
+                });
+              }
+            },
+            isSelected: selection,
+            children: const [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("Connexion", style: TextStyle(color: defaultColor)),
               ),
-            ),
-            const SizedBox(width: 15),
-            if (selection[0] == false)
-            Expanded(
-              child: Container(
-                child: TextField(
-                  controller: lastname,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)
-                      ),
-                      hintText: "Nom"
-                  ),
-                ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child:
+                    Text("Inscription", style: TextStyle(color: defaultColor)),
               ),
-            ),
-
-          ]),
-
-        const SizedBox(height: 10),
-        TextField(
-          controller: mail,
-          decoration: InputDecoration(
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              hintText: "Email"),
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: password,
-          obscureText: true,
-          decoration: InputDecoration(
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              hintText: "Mot de passe"),
-        ),
-        const SizedBox(height: 10),
-
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: defaultColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            ],
           ),
-          onPressed: () {
-            if (selection[0] == false) {
-              //si on en mode inscription
-              FirestoreHelper()
-                  .register(
-                      mail.text, password.text, lastname.text, firstname.text)
-                  .then((value) {
-                //si la méthode fonctionne bien
-                setState(() {
-                  myUser = value;
+
+          //image
+          const SizedBox(height: 5),
+          Image.network(defaultImage, height: 200, width: 200),
+          const SizedBox(height: 5),
+
+          if (selection[0] == false)
+            Column(
+              children: [
+                _buildLanguageDropdown(),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: firstname,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          hintText: "Prénom",
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: TextField(
+                        controller: lastname,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          hintText: "Nom",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+          const SizedBox(height: 10),
+          TextField(
+            controller: mail,
+            decoration: InputDecoration(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintText: "Email"),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: password,
+            obscureText: true,
+            decoration: InputDecoration(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintText: "Mot de passe"),
+          ),
+          const SizedBox(height: 10),
+
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: defaultColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              if (selection[0] == false) {
+                //si on en mode inscription
+                FirestoreHelper()
+                    .register(mail.text, password.text, lastname.text,
+                        firstname.text, selectedLanguage)
+                    .then((value) {
+                  //si la méthode fonctionne bien
+                  setState(() {
+                    myUser = value;
+                  });
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return DashBoard(mail: mail.text, password: password.text);
+                  }));
+                }).catchError((onError) {
+                  //si on constate une erreur
+                  popUp();
                 });
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return DashBoard(mail: mail.text, password: password.text);
-                }));
-              }).catchError((onError) {
-                //si on constate une erreur
-                popUp();
-              });
-            } else {
-              //si en mode connexion
-              FirestoreHelper().connect(mail.text, password.text).then((value) {
-                setState(() {
-                  myUser = value;
+              } else {
+                //si en mode connexion
+                FirestoreHelper()
+                    .connect(mail.text, password.text)
+                    .then((value) {
+                  setState(() {
+                    myUser = value;
+                  });
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return DashBoard(mail: mail.text, password: password.text);
+                  }));
+                }).catchError((onError) {
+                  popUp();
                 });
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return DashBoard(mail: mail.text, password: password.text);
-                }));
-              }).catchError((onError) {
-                popUp();
-              });
-            }
-          },
-          child: const Text('Valider'),
-        )
-      ],
+              }
+            },
+            child: const Text('Valider'),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageDropdown() {
+    final Map<String, String> languageMapping = {
+      "fr": "Français",
+      "en": "Anglais",
+      "es": "Espagnol",
+      "de": "Allemand"
+    };
+
+    return DropdownButton<String>(
+      value: selectedLanguage,
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedLanguage = newValue!;
+        });
+      },
+      items: languageMapping.keys.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(languageMapping[value]!),
+        );
+      }).toList(),
+      dropdownColor: Colors.grey[200],
+      style: const TextStyle(color: Colors.black, fontSize: 18),
+      icon: const Icon(Icons.language),
+      iconSize: 30,
+      elevation: 16,
+      underline: Container(
+        height: 2,
+        color: Colors.grey[400],
+      ),
     );
   }
 }

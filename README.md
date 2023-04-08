@@ -15,4 +15,5 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-> **Note:** Update the project with your own Firebase project configuration.
+> **Note:** Bien que vous pouvez créer un compte (avec de fausses adresses mails de préférence), vous pouvez aussi utiliser le compte suivant pour vous connecter directement : 
+> email : `test@gmail.com` / password : `test123`

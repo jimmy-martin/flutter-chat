@@ -13,7 +13,7 @@ class FirestoreHelper {
   final firebaseMessages = FirebaseFirestore.instance.collection("MESSAGES");
 
   Future<Customer> register(
-      String email, String password, String lastname, String firstname) async {
+      String email, String password, String lastname, String firstname, String language) async {
     UserCredential credential = await auth.createUserWithEmailAndPassword(
         email: email, password: password);
 
@@ -27,6 +27,7 @@ class FirestoreHelper {
         "lastname": lastname,
         "firstname": firstname,
         "email": email,
+        "language": language,
         "favorites": []
       };
 
