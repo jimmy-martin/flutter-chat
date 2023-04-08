@@ -10,6 +10,7 @@ class Customer {
   String? nickname;
   late String email;
   List? favorites;
+  late String language;
 
   String get fullName {
     return '$firstname $lastname';
@@ -21,6 +22,7 @@ class Customer {
     firstname = map['firstname'];
     lastname = map['lastname'];
     email = map['email'];
+    language = map['language'] ?? defaultLanguage;
     avatar = map['avatar'] ?? defaultImage;
     favorites = map['favorites'] ?? [];
     Timestamp? provisionalTime = map['birthday'];
@@ -36,5 +38,6 @@ class Customer {
     firstname = "";
     lastname = "";
     email = "";
+    language = defaultLanguage;
   }
 }

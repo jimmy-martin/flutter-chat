@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/globals.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_chat/repositories/message_repository.dart';
 import 'package:flutter_chat/services/firestore_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
+import 'package:translator/translator.dart';
 
 class Chat extends StatefulWidget {
   final Customer customer;
@@ -21,6 +24,31 @@ class _ChatState extends State<Chat> {
   final TextEditingController _messageController = TextEditingController();
   final MessageRepository _messageRepository = MessageRepository();
   final ScrollController _scrollController = ScrollController();
+  StreamSubscription<QuerySnapshot>? _messageSubscription;
+  final GoogleTranslator _translator = GoogleTranslator();
+
+  final _messagesStream =
+      FirestoreHelper().firebaseMessages.orderBy('time').snapshots();
+
+  @override
+  void initState() {
+    super.initState();
+    _messageSubscription = _messagesStream.listen((snapshot) {
+      _scrollToBottom();
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        _scrollToBottom();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +65,16 @@ class _ChatState extends State<Chat> {
 
   Widget _buildMessageList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirestoreHelper().firebaseMessages.orderBy('time').snapshots(),
+      stream: _messagesStream,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          print(snapshot.error.toString());
-          return Text(snapshot.error.toString());
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
         }
-
         List<QueryDocumentSnapshot> messages = snapshot.data!.docs;
         return ListView.builder(
           controller: _scrollController,
           itemCount: messages.length,
           itemBuilder: (context, index) {
-
             final message = Message(
               id: messages[index]['id'],
               content: messages[index]['content'],
@@ -63,7 +88,16 @@ class _ChatState extends State<Chat> {
                 message.receiverId == myUser.id &&
                     message.senderId == widget.customer.id) {
               bool isSentByCurrentUser = message.senderId == myUser.id;
-              return _buildMessageBubble(message, isSentByCurrentUser);
+              return FutureBuilder<Widget>(
+                future: _buildMessageBubble(message, isSentByCurrentUser),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return snapshot.data!;
+                  } else {
+                    return Container();
+                  }
+                },
+              );
             } else {
               return Container();
             }
@@ -73,9 +107,18 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  Widget _buildMessageBubble(Message message, bool isSentByCurrentUser) {
+  Future<Widget> _buildMessageBubble(
+      Message message, bool isSentByCurrentUser) async {
     final formatter = DateFormat('HH:mm');
     final hours = formatter.format(message.time.toDate());
+
+    bool isTranslated = false;
+    if (myUser.language != widget.customer.language && !isSentByCurrentUser) {
+      Translation translation =
+          await _translator.translate(message.content, to: myUser.language);
+      message.content = translation.text;
+      isTranslated = true;
+    }
 
     return Align(
       alignment:
@@ -94,6 +137,18 @@ class _ChatState extends State<Chat> {
               message.content,
               style: const TextStyle(color: Colors.white),
             ),
+            if (isTranslated)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  "Traduit",
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 10,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
             const SizedBox(height: 8),
             Text(
               hours,
@@ -148,14 +203,18 @@ class _ChatState extends State<Chat> {
     _messageRepository.sendMessage(message);
     _messageController.clear();
 
-    _scrollToBottom();
+    if (message.senderId != myUser.id) {
+      _scrollToBottom();
+    }
   }
 
   void _scrollToBottom() {
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 }
